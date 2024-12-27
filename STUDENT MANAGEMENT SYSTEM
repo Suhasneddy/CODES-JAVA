@@ -1,0 +1,194 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+class Student {
+    private String id;
+    private String name;
+    private ArrayList<Course> courses;
+
+    public Student(String id, String name) {
+        this.id = id;
+        this.name = name;
+        this.courses = new ArrayList<>();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void addCourse(Course course) {
+        courses.add(course);
+    }
+
+    public void removeCourse(String courseId) {
+        courses.removeIf(course -> course.getId().equals(courseId));
+    }
+
+    public void printCourses() {
+        System.out.println("Courses for " + name + ":");
+        for (Course course : courses) {
+            System.out.println(course);
+        }
+    }
+}
+
+class Course {
+    private String id;
+    private String name;
+    private int credits;
+
+    public Course(String id, String name, int credits) {
+        this.id = id;
+        this.name = name;
+        this.credits = credits;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String toString() {
+        return "Course ID: " + id + ", Name: " + name + ", Credits: " + credits;
+    }
+}
+
+class StudentManagementSystem {
+    private Map<String, Student> students;
+    private Map<String, Course> courses;
+
+    public StudentManagementSystem() {
+        students = new HashMap<>();
+        courses = new HashMap<>();
+    }
+
+    public void addStudent(Student student) {
+        students.put(student.getId(), student);
+        System.out.println("Added student: " + student.getName());
+    }
+
+    public void removeStudent(String studentId) {
+        students.remove(studentId);
+        System.out.println("Removed student with ID: " + studentId);
+    }
+
+    public Student getStudent(String studentId) {
+        return students.get(studentId);
+    }
+
+    public void addCourse(Course course) {
+        courses.put(course.getId(), course);
+        System.out.println("Added course: " + course);
+    }
+
+    public void removeCourse(String courseId) {
+        courses.remove(courseId);
+        System.out.println("Removed course with ID: " + courseId);
+    }
+
+    public Course getCourse(String courseId) {
+        return courses.get(courseId);
+    }
+
+    public void enrollStudentInCourse(String studentId, String courseId) {
+        Student student = students.get(studentId);
+        Course course = courses.get(courseId);
+
+        if (student != null && course != null) {
+            student.addCourse(course);
+            System.out.println("Enrolled " + student.getName() + " in " + course);
+        } else {
+            System.out.println("Student or Course not found.");
+        }
+    }
+
+    public void unenrollStudentFromCourse(String studentId, String courseId) {
+        Student student = students.get(studentId);
+
+        if (student != null) {
+            student.removeCourse(courseId);
+            System.out.println("Unenrolled " + student.getName() + " from course with ID: " + courseId);
+        } else {
+            System.out.println("Student not found.");
+        }
+    }
+
+    public void printStudentCourses(String studentId) {
+        Student student = students.get(studentId);
+        
+        if (student != null) {
+            student.printCourses();
+        } else {
+            System.out.println("Student not found.");
+        }
+    }
+
+    public void printAllStudents() {
+        System.out.println("All Students:");
+        for (Student student : students.values()) {
+            System.out.println("ID: " + student.getId() + ", Name: " + student.getName());
+        }
+    }
+    
+    public void printAllCourses() {
+        System.out.println("All Courses:");
+        for (Course course : courses.values()) {
+            System.out.println(course);
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        StudentManagementSystem sms = new StudentManagementSystem();
+
+        // Create students
+        Student student1 = new Student("001", "Alice");
+        Student student2 = new Student("002", "Bob");
+
+        // Add students to the system
+        sms.addStudent(student1);
+        sms.addStudent(student2);
+
+        // Create courses
+        Course course1 = new Course("C101", "Mathematics", 3);
+        Course course2 = new Course("C102", "Physics", 4);
+        Course course3 = new Course("C103", "Chemistry", 3);
+
+        // Add courses to the system
+        sms.addCourse(course1);
+        sms.addCourse(course2);
+        sms.addCourse(course3);
+
+        // Enroll students in courses
+        sms.enrollStudentInCourse("001", "C101");
+        sms.enrollStudentInCourse("001", "C102");
+        sms.enrollStudentInCourse("002", "C103");
+
+        // Print all students
+        sms.printAllStudents();
+
+        // Print all courses
+        sms.printAllCourses();
+
+        // Print courses for a specific student
+        sms.printStudentCourses("001");
+
+        // Unenroll a student from a course
+        sms.unenrollStudentFromCourse("001", "C102");
+
+        // Print courses for the student again
+        sms.printStudentCourses("001");
+
+        // Remove a student from the system
+        sms.removeStudent("002");
+
+        // Print all students again
+        sms.printAllStudents();
+    }
+}
