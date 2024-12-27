@@ -1,0 +1,241 @@
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+class Book {
+    private String id;
+    private String title;
+    private String author;
+    private boolean isAvailable;
+
+    public Book(String id, String title, String author) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.isAvailable = true;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(boolean isAvailable) {
+        this.isAvailable = isAvailable;
+    }
+
+    @Override
+    public String toString() {
+        return "Book ID: " + id + ", Title: " + title + ", Author: " + author + ", Available: " + isAvailable;
+    }
+}
+
+class Member {
+    private String id;
+    private String name;
+    private ArrayList<Book> borrowedBooks;
+
+    public Member(String id, String name) {
+        this.id = id;
+        this.name = name;
+        this.borrowedBooks = new ArrayList<>();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void borrowBook(Book book) {
+        borrowedBooks.add(book);
+    }
+
+    public void returnBook(String bookId) {
+        borrowedBooks.removeIf(book -> book.getId().equals(bookId));
+    }
+
+    public void printBorrowedBooks() {
+        System.out.println("Borrowed Books for " + name + ":");
+        for (Book book : borrowedBooks) {
+            System.out.println(book);
+        }
+    }
+}
+
+class Library {
+    private Map<String, Book> books;
+    private Map<String, Member> members;
+    private ArrayList<Transaction> transactions;
+
+    public Library() {
+        books = new HashMap<>();
+        members = new HashMap<>();
+        transactions = new ArrayList<>();
+    }
+
+    public void addBook(Book book) {
+        books.put(book.getId(), book);
+        System.out.println("Added book: " + book.getTitle());
+    }
+
+    public void removeBook(String bookId) {
+        books.remove(bookId);
+        System.out.println("Removed book with ID: " + bookId);
+    }
+
+    public Book getBook(String bookId) {
+        return books.get(bookId);
+    }
+
+    public void registerMember(Member member) {
+        members.put(member.getId(), member);
+        System.out.println("Registered member: " + member.getName());
+    }
+
+    public void removeMember(String memberId) {
+        members.remove(memberId);
+        System.out.println("Removed member with ID: " + memberId);
+    }
+
+    public Member getMember(String memberId) {
+        return members.get(memberId);
+    }
+
+    public void borrowBook(String memberId, String bookId) {
+        Member member = members.get(memberId);
+        Book book = books.get(bookId);
+
+        if (member != null && book != null && book.isAvailable()) {
+            member.borrowBook(book);
+            book.setAvailable(false);
+            transactions.add(new Transaction(memberId, bookId, new Date(), "borrow"));
+            System.out.println(member.getName() + " borrowed " + book.getTitle());
+        } else {
+            System.out.println("Book is not available or Member/Book not found.");
+        }
+    }
+
+    public void returnBook(String memberId, String bookId) {
+        Member member = members.get(memberId);
+        Book book = books.get(bookId);
+
+        if (member != null && book != null && !book.isAvailable()) {
+            member.returnBook(bookId);
+            book.setAvailable(true);
+            transactions.add(new Transaction(memberId, bookId, new Date(), "return"));
+            System.out.println(member.getName() + " returned " + book.getTitle());
+        } else {
+            System.out.println("Book was not borrowed or Member/Book not found.");
+        }
+    }
+
+    public void printAllBooks() {
+        System.out.println("All Books:");
+        for (Book book : books.values()) {
+            System.out.println(book);
+        }
+    }
+
+    public void printAllMembers() {
+        System.out.println("All Members:");
+        for (Member member : members.values()) {
+            System.out.println("ID: " + member.getId() + ", Name: " + member.getName());
+        }
+    }
+
+    public void printTransactions() {
+        System.out.println("All Transactions:");
+        for (Transaction transaction : transactions) {
+            System.out.println(transaction);
+        }
+    }
+}
+
+class Transaction {
+    private String memberId;
+    private String bookId;
+    private Date date;
+    private String type; // "borrow" or "return"
+
+    public Transaction(String memberId, String bookId, Date date, String type) {
+        this.memberId = memberId;
+        this.bookId = bookId;
+        this.date = date;
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "Transaction [Member ID: " + memberId + ", Book ID: " + bookId + ", Date: " + date + ", Type: " + type + "]";
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Library library = new Library();
+
+        // Create books
+        Book book1 = new Book("B001", "The Catcher in the Rye", "J.D. Salinger");
+        Book book2 = new Book("B002", "To Kill a Mockingbird", "Harper Lee");
+        Book book3 = new Book("B003", "1984", "George Orwell");
+
+        // Add books to the library
+        library.addBook(book1);
+        library.addBook(book2);
+        library.addBook(book3);
+
+        // Create members
+        Member member1 = new Member("M001", "John Doe");
+        Member member2 = new Member("M002", "Jane Smith");
+
+        // Register members to the library
+        library.registerMember(member1);
+        library.registerMember(member2);
+
+        // Borrow books
+        library.borrowBook("M001", "B001");
+        library.borrowBook("M002", "B002");
+
+        // Print all books
+        library.printAllBooks();
+
+        // Print all members
+        library.printAllMembers();
+
+        // Print transactions
+        library.printTransactions();
+
+        // Return books
+        library.returnBook("M001", "B001");
+
+        // Print transactions again
+        library.printTransactions();
+
+        // Remove a book from the library
+        library.removeBook("B003");
+
+        // Print all books again
+        library.printAllBooks();
+
+        // Remove a member from the library
+        library.removeMember("M002");
+
+        // Print all members again
+        library.printAllMembers();
+    }
+}
